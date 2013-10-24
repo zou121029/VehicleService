@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ServiceConfiguration serviceName="VehicleService" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="3" osVersion="*" schemaVersion="2012-10.1.8">
+  <Role name="VehicleService.Portal">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=vehicleservicestorage;AccountKey=pns9TGtzejrKO4AjUY+GNCsXf/3Vc+POb73dvrb2SYR99cGsBOvyoN7kTgA7BWx2i5eY4eEaICSWC/sCvhN5rw==" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.Enabled" value="true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountUsername" value="jackry" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountEncryptedPassword" value="MIIBnQYJKoZIhvcNAQcDoIIBjjCCAYoCAQAxggFOMIIBSgIBADAyMB4xHDAaBgNVBAMME1dpbmRvd3MgQXp1cmUgVG9vbHMCEBhzzpCje22kS1jPjnsnXVAwDQYJKoZIhvcNAQEBBQAEggEAP7yehfsLN5uL/GgWeEYmo4giIuGwZ3NO3GU1gf+IBnB3aBqsGh4HVNuKID9shJCsLIUeSoM3ZD3e2xm210QBptVSb+IRUJ/GJu3KXwRc0RfWExKnWZKwLdwIpRLkxNo5QJ968Hoj8bzflRV+gZWkWfPVKYfH8oM3yO2Os4X75a27wBf7NOk9/YBuTl8N+Kj6n/tnolVVBdxTI+oZVOQqxE3NAX1QQ9Zj15QcqtsmuRC+y7TmDHXT+ObA5SCqNIkBQ3RkzwLeam1uMyZwqXAbI2zw+yc9JrJ+8hK8l3/DvomVwt1T0iHt4m6hEK+7MLInJJyo8h1i9vxi0WseBLzsJjAzBgkqhkiG9w0BBwEwFAYIKoZIhvcNAwcECHyN2XvmiCXYgBCLbJ8q0WF2a+8EfqniOCqB" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountExpiration" value="2014-07-28T23:59:59.0000000+08:00" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteForwarder.Enabled" value="true" />
+    </ConfigurationSettings>
+    <Certificates>
+      <Certificate name="Microsoft.WindowsAzure.Plugins.RemoteAccess.PasswordEncryption" thumbprint="8EEFC8546A22910FCF2E205805EB63B8E0E3C5B2" thumbprintAlgorithm="sha1" />
+    </Certificates>
+  </Role>
+</ServiceConfiguration>

@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+@{
+    var jTableStyle = "metro/blue/jtable.css";
+    if (!string.IsNullOrEmpty(Request["jTableStyle"]))
+    {
+        jTableStyle = Request["jTableStyle"];
+    }
+}
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>@ViewBag.Title - 车辆服务系统</title>
+        <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <meta name="viewport" content="width=device-width" />
+        @Styles.Render("~/Content/css")
+        @Scripts.Render("~/bundles/modernizr")
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/jqueryui")
+        <link href="@Url.Content("~/Content/themes/metroblue/jquery-ui.css")" rel="stylesheet" type="text/css" />
+
+        <link type="text/css" href="~/Content/menu.css" rel="stylesheet" />
+        <script type="text/javascript" src="~/Scripts/menu.js"></script>
+
+        <link href="@Url.Content("~/Scripts/jtable/themes/" + jTableStyle)" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="@Url.Content("~/Scripts/jtable/jquery.jtable.js")"></script>
+
+        <link href="@Url.Content("~/Scripts/validationEngine/validationEngine.jquery.css")" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="@Url.Content("~/Scripts/validationEngine/jquery.validationEngine.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/Scripts/validationEngine/jquery.validationEngine-en.js")"></script>
+
+@*        <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.ui.widget.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.iframe-transport.js")"></script>*@
+        <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.fileuploader.js")"></script>
+        <link href="~/Content/fileUploader.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <header>
+            <div class="content-wrapper">
+                <div class="float-left">
+                    <p class="site-title">@Html.ActionLink("车辆服务系统 - 4S店自服务管理界面", "Index", "Home")</p>
+                </div>
+                <div class="float-right">
+                    <section id="login">
+                        @Html.Partial("_LoginPartial")
+                    </section>
+                </div>
+            </div>
+        </header>
+
+        <div id="body">
+            <div id="menu" class="content-wrapper">
+                <ul class="menu">
+                    <li><a href="/Home/Index" class="parent"><span>首页</span></a></li>
+                    <li><a href="#" class="parent"><span>客户请求响应</span></a>
+                        <div>
+                            <ul>
+                                <li><a href="/MobileRequestManagement/Appointment"><span>预约维修保养</span></a></li>
+                                <li><a href="/MobileRequestManagement/RescueRequest"><span>救援请求</span></a></li>
+                                <li><a href="/MobileRequestManagement/DrivingTest"><span>预约试乘试驾</span></a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li><a href="#" class="parent"><span>信息管理</span></a>
+                        <div>
+                            <ul>
+                                <li><a href="#" class="parent"><span>消息发布管理</span></a>
+                                    <div>
+                                        <ul>
+                                            <li><a href="/RichMessageManagement/NewsManagement"><span>新闻</span></a></li>
+                                            <li><a href="/RichMessageManagement/EventManagement"><span>活动</span></a></li>
+                                            <li><a href="/RichMessageManagement/PromotionManagement"><span>促销</span></a></li>
+                                            <li><a href="/RichMessageManagement/TipsManagement"><span>小贴士</span></a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li><a href="#" class="parent"><span>服务人员管理</span></a>
+                                    <div>
+                                        <ul>
+                                            <li><a href="/ServiceEmployeeManagement/ServiceAgentManagement"><span>服务顾问</span></a></li>
+                                            <li><a href="/ServiceEmployeeManagement/WorkerManagement"><span>维修工人</span></a></li>
+                                            <li><a href="/ServiceEmployeeManagement/SalesManagement"><span>销售顾问</span></a></li>
+                                            <li><a href="/ServiceEmployeeManagement/InsuranceAgentManagement"><span>保险顾问</span></a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li><a href="/VehicleTypeManagement/Index"><span>车型管理</span></a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li><a href="/CustomerUserManagement/Index"><span>车主会员管理</span></a></li>
+                    <li><a href="/Account/Manage"><span>账户管理</span></a></li>
+                    @*<li><a href="#" class="parent"><span>统计分析</span></a>
+                        <div>
+                            <ul>
+                                <li><a href="/Statistics/Index"><span>统计分析</span></a></li>
+                            </ul>
+                        </div>
+                    </li>*@
+                    @*<li class="last"><a href="/Home/Contact"><span>联系我们</span></a></li>*@
+                </ul>
+            </div>
+            @RenderSection("featured", required: false)
+            <section class="content-wrapper main-content clear-fix">
+                @RenderBody()
+            </section>
+        </div>
+@*        <footer>
+            <div class="content-wrapper">
+                <p>&copy; @DateTime.Now.Year - My ASP.NET MVC Application</p>
+            </div>
+        </footer>*@
+
+        @RenderSection("scripts", required: false)
+    </body>
+</html>

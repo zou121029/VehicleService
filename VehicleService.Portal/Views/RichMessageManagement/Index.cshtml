@@ -1,0 +1,146 @@
+﻿
+<div id="TableContainer"></div>
+
+<div id="uploadDialog" title="图片上传" style="display:none;"/>
+
+<script type="text/javascript">
+ 
+    $(document).ready(function () {
+ 
+        $('#TableContainer').jtable({
+            title: '@ViewBag.TableHeader',
+            paging: true, //Enable paging
+            pageSize: 20, //Set page size (default: 10)
+            sorting: true, //Enable sorting
+            defaultSorting: 'ID ASC', //Set default sorting
+            //selecting: true,
+            //multiselect: true,
+            //selectingCheckboxes: true,
+            //selectOnRowClick: false,
+            actions: {
+                listAction: '/RichMessageManagement/Get' + '@ViewBag.Type' + 'List',
+                deleteAction: '/RichMessageManagement/Delete' + '@ViewBag.Type',
+                updateAction: '/RichMessageManagement/Update' + '@ViewBag.Type',
+                createAction: '/RichMessageManagement/Create' + '@ViewBag.Type',
+            },
+            fields: {
+                ID: {
+                    title: '编号',
+                    key: true,
+                    create: false,
+                    edit: false,
+                    width: '10%'
+                },
+                Title: {
+                    title: '标题',
+                    width: '16%'
+                },
+                Content: {
+                    title: '内容',
+                    type: 'textarea',
+                    display: function (data) {
+                        if (data.record.Content != undefined && data.record.Content != '') {
+                            if (data.record.Content.length > 100) {
+                                return '<p title=\"' + data.record.Content + '\">' + data.record.Content.substring(0, 100) + '...</p>';
+                            } else {
+                                return '<p title=\"' + data.record.Content + '\">' + data.record.Content + '</p>';
+                            }
+                        } else {
+                            return '';
+                        }
+                    },
+                    width: '26%'
+                },
+                PictureUrl: {
+                    title: '图片',
+                    display: function (data) {
+                        if (data.record.PictureUrl != undefined && data.record.PictureUrl != '') {
+                            return '<img title=\"' + data.record.PictureUrl + '\" src=\"' + data.record.PictureUrl + '\" width=\"260\"/>';
+                        } else {
+                            return '<p>无图片</p>'
+                        }
+                    },
+                    //input: function (data) {
+                    //    var pictureUrl = '';
+                    //    if (data.record != undefined &&
+                    //        data.record.PictureUrl != undefined && data.record.PictureUrl != '') {
+                    //        pictureUrl = data.record.PictureUrl;
+                    //    }
+                    //    return ret = '<input type="file" name="PictureUploader" value="' + pictureUrl + '" />';
+                    //},
+                    edit: false,
+                    create: false,
+                    sorting: false,
+                    width: '22%'
+                },
+                TimeStamp: {
+                    title: '发布时间',
+                    type: 'date',
+                    displayFormat: 'yy年mm月dd日',
+                    edit: false,
+                    create: false,
+                    width: '15%'
+                },
+                Upload: {
+                    title: '操作',
+                    edit: false,
+                    create: false,
+                    display: function (data) {
+                        return '<a href="#" onclick="javascript:showUploader(' + data.record.ID + ')">上传图片</a>';
+                    },
+                    width: '15%'
+                }
+            },
+            messages: {
+                serverCommunicationError: '与服务器连接错误，请重试。',
+                loadingMessage: '读取数据中...',
+                noDataAvailable: '没有记录',
+                addNewRecord: '添加新记录',
+                editRecord: '修改记录',
+                areYouSure: '您确定操作吗？',
+                deleteConfirmation: '您确定要删除选中项吗？',
+                save: '保存',
+                saving: '保存中',
+                cancel: '取消',
+                deleteText: '删除',
+                deleting: '删除中',
+                error: '错误',
+                close: '关闭',
+                cannotLoadOptionsFor: '无法读取【{0}】的选项',
+                pagingInfo: '显示第{0}至第{1}条记录，总共{2}条记录',
+                pageSizeChangeLabel: '每页记录数',
+                gotoPageLabel: '转到页面',
+                canNotDeletedRecords: '无法删除总共{1}条记录中的{0}条！',
+                deleteProggress: '正在删除总共{1}条记录中的{0}条...'
+            },
+            formCreated: function (event, data) {
+                data.form.find('input[name="Title"]').addClass('validate[required]');
+                data.form.validationEngine();
+            },
+            formSubmitting: function (event, data) {
+                return data.form.validationEngine('validate');
+            },
+            formClosed: function (event, data) {
+                data.form.validationEngine('hide');
+                data.form.validationEngine('detach');
+            }
+        });
+ 
+        //Load list from server
+        $('#TableContainer').jtable('load');
+    });
+
+    function showUploader(id) {
+        $("#uploadDialog").html("<form action='/Uploader/UploadImage' method='post' enctype='multipart/form-data'><input type='hidden' name='id' value='" + id + "'/><input type='hidden' name='type' value='" + "RichMessage" + "'/><input type='file' name='file' class='fileUpload'><button id='px-submit' type='submit'>上传</button><button id='px-clear' type='reset'>清除</button></form>");
+        $('.fileUpload').fileUploader();
+        $("#uploadDialog").dialog({
+            height: 660,
+            width: 860,
+            close: function () {
+                $('#TableContainer').jtable('load');
+            }
+        });
+    }
+ 
+</script>
+

@@ -1,0 +1,201 @@
+﻿
+<div id="TableContainer"></div>
+
+<script type="text/javascript">
+ 
+    $(document).ready(function () {
+ 
+        $('#TableContainer').jtable({
+            title: '@ViewBag.TableHeader',
+            paging: true, //Enable paging
+            pageSize: 20, //Set page size (default: 10)
+            sorting: true, //Enable sorting
+            defaultSorting: 'ID ASC', //Set default sorting
+            //selecting: true,
+            //multiselect: true,
+            //selectingCheckboxes: true,
+            //selectOnRowClick: false,
+            actions: {
+                listAction: '/MobileRequestManagement/GetAppointmentList',
+                updateAction: '/MobileRequestManagement/UpdateAppointment'
+            },
+            fields: {
+                ID: {
+                    title: '编号',
+                    key: true,
+                    create: false,
+                    edit: false,
+                    width: '6%'
+                },
+                Type: {
+                    title: '项目',
+                    options: { 0: '维修', 1: '保养' },
+                    width: '5%'
+                },
+                VehicleNumber: {
+                    title: '车牌号',
+                    width: '8%'
+                },
+                CustomerName: {
+                    title: '姓名',
+                    width: '10%'
+                },
+                PhoneNumber: {
+                    title: '电话',
+                    width: '8%'
+                },
+                CustomerId: {
+                    title: '用户编号',
+                    sorting: false,
+                    edit: false,
+                    create: false,
+                    width: '8%'
+                },
+                DateTimeText: {
+                    title: '预约时间',
+                    edit: false,
+                    create: false,
+                    sorting: false,
+                    width: '10%'
+                },
+                Date: {
+                    title: '日期',
+                    type: 'date',
+                    list: false,
+                },
+                TimeRange: {
+                    title: '时间段',
+                    options: { 0: '09:00 - 12:00', 1: '12:00 - 14:00', 2: '14:00 - 16:00', 3: '16:00 - 18:00' },
+                    list: false,
+                },
+                Comment: {
+                    title: '备注',
+                    type: 'textarea',
+                    sorting: false,
+                    width: '10%'
+                },
+                TimeStamp: {
+                    title: '提交时间',
+                    type: 'date',
+                    sorting: false,
+                    edit: false,
+                    width: '8%'
+                },
+                ConfirmTime: {
+                    title: '确认时间',
+                    type: 'date',
+                    sorting: false,
+                    edit: false,
+                    create: false,
+                    width: '8%'
+                },
+                CompleteTime: {
+                    type: 'date',
+                    list: false,
+                    edit: false,
+                    create: false,
+                },
+                Status: {
+                    title: '状态',
+                    options: { 0: '未处理', 1: '已确认', 2: '已完成', 3: '已取消' },
+                    sorting: false,
+                    edit: false,
+                    create: false,
+                    width: '6%'
+                },
+                ChangeStatus: {
+                    title: '操作',
+                    edit: false,
+                    create: false,
+                    display: function (data) {
+                        if (data.record.Status != undefined && data.record.Status <= 1) {
+                            return '<a href="#" onclick="javascript:cancelAppointment(' + data.record.ID + ')">取消</a>' +
+                                '<a href="#" onclick="javascript:finishAppointment(' + data.record.ID + ')">完成</a>';
+                        } else {
+                            return '';
+                        }
+                    },
+                    width: '10%'
+                }
+            },
+            messages: {
+                serverCommunicationError: '与服务器连接错误，请重试。',
+                loadingMessage: '读取数据中...',
+                noDataAvailable: '没有记录',
+                addNewRecord: '添加新记录',
+                editRecord: '修改记录',
+                areYouSure: '您确定操作吗？',
+                deleteConfirmation: '您确定要删除选中项吗？',
+                save: '保存',
+                saving: '保存中',
+                cancel: '取消',
+                deleteText: '删除',
+                deleting: '删除中',
+                error: '错误',
+                close: '关闭',
+                cannotLoadOptionsFor: '无法读取【{0}】的选项',
+                pagingInfo: '显示第{0}至第{1}条记录，总共{2}条记录',
+                pageSizeChangeLabel: '每页记录数',
+                gotoPageLabel: '转到页面',
+                canNotDeletedRecords: '无法删除总共{1}条记录中的{0}条！',
+                deleteProggress: '正在删除总共{1}条记录中的{0}条...'
+            },
+            formCreated: function (event, data) {
+                data.form.find('input[name="VehicleNumber"]').addClass('validate[required]');
+                data.form.find('input[name="PhoneNumber"]').addClass('validate[required]');
+                data.form.validationEngine();
+            },
+            formSubmitting: function (event, data) {
+                return data.form.validationEngine('validate');
+            },
+            formClosed: function (event, data) {
+                data.form.validationEngine('hide');
+                data.form.validationEngine('detach');
+            }
+        });
+ 
+        //Load list from server
+        $('#TableContainer').jtable('load');
+    });
+
+    function finishAppointment(id) {
+        if (confirm("确定该预约服务已完成吗？")) {
+            $.ajax({
+                url: 'FinishAppointment',
+                type: 'POST',
+                data: { id: id },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('操作失败，请重试！');
+                },
+                success: function (data, textStatus) {
+                    if (data.Result == "OK") {
+                        $('#TableContainer').jtable('load');
+                    } else {
+                        alert(data.Message);
+                    }
+                }
+            });
+        }
+    }
+
+    function cancelAppointment(id) {
+        if (confirm("确定取消该预约吗？")) {
+            $.ajax({
+                url: 'CancelAppointment',
+                type: 'POST',
+                data: { id: id },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('操作失败，请重试！');
+                },
+                success: function (data, textStatus) {
+                    if (data.Result == "OK") {
+                        $('#TableContainer').jtable('load');
+                    } else {
+                        alert(data.Message);
+                    }
+                }
+            });
+        }
+    }
+ 
+</script>

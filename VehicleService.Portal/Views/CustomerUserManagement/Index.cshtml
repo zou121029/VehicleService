@@ -1,0 +1,174 @@
+﻿
+<div id="TableContainer"></div>
+
+<script type="text/javascript">
+ 
+    $(document).ready(function () {
+ 
+        $('#TableContainer').jtable({
+            title: '@ViewBag.TableHeader',
+            paging: true, //Enable paging
+            pageSize: 20, //Set page size (default: 10)
+            sorting: true, //Enable sorting
+            defaultSorting: 'ID ASC', //Set default sorting
+            //selecting: true,
+            //multiselect: true,
+            //selectingCheckboxes: true,
+            //selectOnRowClick: false,
+            actions: {
+                listAction: '/CustomerUserManagement/GetCustomerUserList',
+                deleteAction: '/CustomerUserManagement/DeleteCustomerUser',
+                updateAction: '/CustomerUserManagement/UpdateCustomerUser',
+                //createAction: '/CustomerUserManagement/CreateCustomerUser',
+            },
+            fields: {
+                ID: {
+                    title: '编号',
+                    key: true,
+                    create: false,
+                    edit: false,
+                    width: '6%'
+                },
+                AccountName: {
+                    title: '用户名',
+                    width: '10%'
+                },
+                CustomerName: {
+                    title: '姓名',
+                    width: '10%'
+                },
+                VehicleNumber: {
+                    title: '车牌号',
+                    width: '10%'
+                },
+                PhoneNumber: {
+                    title: '电话',
+                    width: '10%'
+                },
+                Email: {
+                    title: '电子邮箱',
+                    width: '10%'
+                },
+                Gender: {
+                    title: '性别',
+                    options: { null: '保密', false: '女士', true: '先生' },
+                    defaultValue: null,
+                    width: '5%'
+                },
+                Birthday: {
+                    title: '生日',
+                    type: 'date',
+                    displayFormat: 'yy年mm月dd日',
+                    width: '10%'
+                },
+                Address: {
+                    title: '地址',
+                    type: 'textarea',
+                    width: '15%'
+                },
+                Status: {
+                    title: '状态',
+                    options: { 0: '可用', 1: '禁用' },
+                    edit: false,
+                    create: false,
+                    width: '5%'
+                },
+                ChangeStatus: {
+                    title: '操作',
+                    edit: false,
+                    create: false,
+                    display: function (data) {
+                        if (data.record.Status != undefined) {
+                            if (data.record.Status == 0) {
+                                return '<a href="#" onclick="javascript:disableCustomerUser(' + data.record.ID + ')">禁用</a>';
+                            } else {
+                                return '<a href="#" onclick="javascript:enableCustomerUser(' + data.record.ID + ')">激活</a>';
+                            }
+                        } else {
+                            return '';
+                        }
+                    },
+                    width: '5%'
+                }
+            },
+            messages: {
+                serverCommunicationError: '与服务器连接错误，请重试。',
+                loadingMessage: '读取数据中...',
+                noDataAvailable: '没有记录',
+                addNewRecord: '添加新记录',
+                editRecord: '修改记录',
+                areYouSure: '您确定操作吗？',
+                deleteConfirmation: '您确定要删除选中项吗？',
+                save: '保存',
+                saving: '保存中',
+                cancel: '取消',
+                deleteText: '删除',
+                deleting: '删除中',
+                error: '错误',
+                close: '关闭',
+                cannotLoadOptionsFor: '无法读取【{0}】的选项',
+                pagingInfo: '显示第{0}至第{1}条记录，总共{2}条记录',
+                pageSizeChangeLabel: '每页记录数',
+                gotoPageLabel: '转到页面',
+                canNotDeletedRecords: '无法删除总共{1}条记录中的{0}条！',
+                deleteProggress: '正在删除总共{1}条记录中的{0}条...'
+            },
+            formCreated: function (event, data) {
+                data.form.find('input[name="AccountName"]').addClass('validate[required]');
+                data.form.find('input[name="PhoneNumber"]').addClass('validate[required]');
+                data.form.validationEngine();
+            },
+            formSubmitting: function (event, data) {
+                return data.form.validationEngine('validate');
+            },
+            formClosed: function (event, data) {
+                data.form.validationEngine('hide');
+                data.form.validationEngine('detach');
+            }
+        });
+ 
+        //Load list from server
+        $('#TableContainer').jtable('load');
+    });
+
+    function disableCustomerUser(id) {
+        if (confirm("确定要禁用该用户吗？")) {
+            $.ajax({
+                url: 'DisableCustomerUser',
+                type: 'POST',
+                data: { id: id },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('操作失败，请重试！');
+                },
+                success: function (data, textStatus) {
+                    if (data.Result == "OK") {
+                        $('#TableContainer').jtable('load');
+                    } else {
+                        alert(data.Message);
+                    }
+                }
+            });
+        }
+    }
+
+    function enableCustomerUser(id) {
+        if (confirm("确定要激活该用户吗？")) {
+            $.ajax({
+                url: 'EnableCustomerUser',
+                type: 'POST',
+                data: { id: id },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('操作失败，请重试！');
+                },
+                success: function (data, textStatus) {
+                    if (data.Result == "OK") {
+                        $('#TableContainer').jtable('load');
+                    } else {
+                        alert(data.Message);
+                    }
+                }
+            });
+        }
+    }
+ 
+</script>

@@ -1,0 +1,233 @@
+﻿
+<div id="TableContainer"></div>
+
+<div id="mapDialog" title="救援位置地图" style="display:none;">
+    <div id="mapDiv" style="width:800px;height:600px;"></div>
+</div>
+
+<script type="text/javascript" src="https://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0&s=1&mkt=zh-cn"></script>
+
+<script type="text/javascript">
+ 
+    $(document).ready(function () {
+ 
+        $('#TableContainer').jtable({
+            title: '@ViewBag.TableHeader',
+            paging: true, //Enable paging
+            pageSize: 20, //Set page size (default: 10)
+            sorting: true, //Enable sorting
+            defaultSorting: 'ID ASC', //Set default sorting
+            //selecting: true,
+            //multiselect: true,
+            //selectingCheckboxes: true,
+            //selectOnRowClick: false,
+            actions: {
+                listAction: '/MobileRequestManagement/GetRescueRequestList',
+                updateAction: '/MobileRequestManagement/UpdateRescueRequest'
+            },
+            fields: {
+                ID: {
+                    title: '编号',
+                    key: true,
+                    create: false,
+                    edit: false,
+                    width: '6%'
+                },
+                VehicleNumber: {
+                    title: '车牌号',
+                    width: '8%'
+                },
+                CustomerName: {
+                    title: '姓名',
+                    width: '10%'
+                },
+                PhoneNumber: {
+                    title: '电话',
+                    width: '8%'
+                },
+                CustomerId: {
+                    title: '用户编号',
+                    sorting: false,
+                    edit: false,
+                    create: false,
+                    width: '8%'
+                },
+                Time: {
+                    title: '求救时间',
+                    type: 'date',
+                    edit: false,
+                    width: '8%'
+                },
+                Latitude: {
+                    list: false,
+                    edit: false,
+                    create: false,
+                },
+                Longitude: {
+                    list: false,
+                    edit: false,
+                    create: false,
+                },
+                Location: {
+                    title: '位置',
+                    edit: false,
+                    create: false,
+                    display: function (data) {
+                        return '<a href="#" onclick="javascript:viewMap(' + data.record.Latitude + ', ' + data.record.Longitude + ')">查看地图</a>';
+                    },
+                    width: '8%'
+                },
+                Comment: {
+                    title: '备注',
+                    type: 'textarea',
+                    sorting: false,
+                    width: '10%'
+                },
+                ConfirmTime: {
+                    title: '确认时间',
+                    type: 'date',
+                    sorting: false,
+                    edit: false,
+                    create: false,
+                    width: '8%'
+                },
+                CompleteTime: {
+                    type: 'date',
+                    list: false,
+                    edit: false,
+                    create: false,
+                },
+                Status: {
+                    title: '状态',
+                    options: { 0: '未处理', 1: '已确认', 2: '已完成', 3: '已取消' },
+                    sorting: false,
+                    edit: false,
+                    create: false,
+                    width: '6%'
+                },
+                ChangeStatus: {
+                    title: '操作',
+                    edit: false,
+                    create: false,
+                    display: function (data) {
+                        if (data.record.Status != undefined && data.record.Status <= 1) {
+                            return '<a href="#" onclick="javascript:cancelRescueRequest(' + data.record.ID + ')">取消</a>' +
+                                '<a href="#" onclick="javascript:finishRescueRequest(' + data.record.ID + ')">完成</a>';
+                        } else {
+                            return '';
+                        }
+                    },
+                    width: '10%'
+                }
+            },
+            messages: {
+                serverCommunicationError: '与服务器连接错误，请重试。',
+                loadingMessage: '读取数据中...',
+                noDataAvailable: '没有记录',
+                addNewRecord: '添加新记录',
+                editRecord: '修改记录',
+                areYouSure: '您确定操作吗？',
+                deleteConfirmation: '您确定要删除选中项吗？',
+                save: '保存',
+                saving: '保存中',
+                cancel: '取消',
+                deleteText: '删除',
+                deleting: '删除中',
+                error: '错误',
+                close: '关闭',
+                cannotLoadOptionsFor: '无法读取【{0}】的选项',
+                pagingInfo: '显示第{0}至第{1}条记录，总共{2}条记录',
+                pageSizeChangeLabel: '每页记录数',
+                gotoPageLabel: '转到页面',
+                canNotDeletedRecords: '无法删除总共{1}条记录中的{0}条！',
+                deleteProggress: '正在删除总共{1}条记录中的{0}条...'
+            },
+        });
+
+        RefreshTable();
+    });
+
+    function RefreshTable() {
+        //Load list from server
+        $('#TableContainer').jtable('load');
+
+        //Refresh every 30 sec
+        setTimeout(RefreshTable, 30 * 1000);
+    }
+
+    function finishRescueRequest(id) {
+        if (confirm("确定该预约试乘试驾已完成吗？")) {
+            $.ajax({
+                url: 'FinishRescueRequest',
+                type: 'POST',
+                data: { id: id },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('操作失败，请重试！');
+                },
+                success: function (data, textStatus) {
+                    if (data.Result == "OK") {
+                        RefreshTable();
+                    } else {
+                        alert(data.Message);
+                    }
+                }
+            });
+        }
+    }
+
+    function cancelRescueRequest(id) {
+        if (confirm("确定取消该预约吗？")) {
+            $.ajax({
+                url: 'CancelRescueRequest',
+                type: 'POST',
+                data: { id: id },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert('操作失败，请重试！');
+                },
+                success: function (data, textStatus) {
+                    if (data.Result == "OK") {
+                        RefreshTable();
+                    } else {
+                        alert(data.Message);
+                    }
+                }
+            });
+        }
+    }
+
+    ///////////////////////////////////////////
+    //////////          Map          //////////
+    ///////////////////////////////////////////
+
+    var map = {};
+    var defaultcursor = {};
+    function changeCursor(e) {
+        map.getRootElement().style.cursor = 'pointer';
+    }
+    function removeInfobox(e) {
+        map.getRootElement().style.cursor = defaultcursor;
+    }
+    function GetMap(latitude, longitude) {
+        var center = new Microsoft.Maps.Location(latitude, longitude);
+        map = new Microsoft.Maps.Map(document.getElementById("mapDiv"),
+        {
+            credentials: "Ar-dTESPJQFysJu_gR_VxIVz7R_fnYzvII4Fq9aHvHZNxShdVzhpAqtZrhpL23Ct",
+            //mapTypeId: Microsoft.Maps.MapTypeId.road,
+            center: center,
+            zoom: 15,
+        });
+        defaultcursor = map.getRootElement().style.cursor;
+        // Add a pin to the center of the map
+        var pin = new Microsoft.Maps.Pushpin(center);
+        map.entities.push(pin);
+    }
+
+    function viewMap(latitude, longitude) {
+        $("#mapDialog").dialog({
+            height: 660,
+            width: 860,
+        });
+        GetMap(latitude, longitude);
+    }
+ 
+</script>
